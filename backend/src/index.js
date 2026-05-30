@@ -1,0 +1,80 @@
+import express from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import { connectDatabase } from '../config/database.js'
+import { errorHandler, authenticateToken } from '../middleware/auth.js'
+
+// Import routes
+import authRoutes from '../routes/authRoutes.js'
+import expenseRoutes from '../routes/expenseRoutes.js'
+import investmentRoutes from '../routes/investmentRoutes.js'
+import mutualFundRoutes from '../routes/mutualFundRoutes.js'
+import loanRoutes from '../routes/loanRoutes.js'
+import goalRoutes from '../routes/goalRoutes.js'
+import incomeRoutes from '../routes/incomeRoutes.js'
+import dashboardRoutes from '../routes/dashboardRoutes.js'
+import reportRoutes from '../routes/reportRoutes.js'
+
+// Load environment variables
+dotenv.config()
+
+const app = express()
+const PORT = process.env.PORT || 5000
+
+// Middleware
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim())
+
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',  // ← add this
+    'http://localhost:3003',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',  // ← and this
+  ],
+  credentials: true
+}))
+
+// Connect to database
+await connectDatabase()
+
+// Routes
+app.use('/api/auth', authRoutes)
+app.use('/api/expenses', expenseRoutes)
+app.use('/api/investments', investmentRoutes)
+app.use('/api/mutual-funds', mutualFundRoutes)
+app.use('/api/loans', loanRoutes)
+app.use('/api/goals', goalRoutes)
+app.use('/api/income', incomeRoutes)
+app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/reports', reportRoutes)
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'MoneyPilot API is running' })
+})
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' })
+})
+
+// Error handler
+app.use(errorHandler)
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`)
+  console.log(`📊 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`)
+})
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully')
+  process.exit(0)
+})
