@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import BrandLogo from '../components/BrandLogo'
 import { useAuthStore } from '../context/authStore'
 
 export default function LoginPage() {
@@ -33,7 +34,7 @@ export default function LoginPage() {
 
       <nav className="relative z-10 flex items-center justify-between px-6 py-6 md:px-16">
         <Link to="/" className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-purple-600 to-blue-500 shadow-[0_0_35px_rgba(124,58,237,0.45)]" />
+          <BrandLogo className="h-10 w-10" />
           <h1 className="text-2xl font-bold">MoneyPilot</h1>
         </Link>
         <Link to="/signup" className="rounded-xl bg-gradient-to-r from-purple-600 to-blue-500 px-5 py-2 font-medium">
@@ -49,10 +50,10 @@ export default function LoginPage() {
           className="w-full max-w-md rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-[0_30px_120px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
         >
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-r from-purple-600 to-blue-500 text-2xl font-black shadow-[0_0_45px_rgba(124,58,237,0.45)]">
-              M
-            </div>
-            <h1 className="text-3xl font-bold">Welcome back</h1>
+            <div className="mx-auto mb-4">
+            <BrandLogo className="h-14 w-14" />
+          </div>
+          <h1 className="text-3xl font-bold">Welcome back</h1>
             <p className="mt-2 text-gray-400">Login to your MoneyPilot dashboard.</p>
           </div>
 
