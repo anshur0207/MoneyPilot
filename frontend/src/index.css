@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(124, 58, 237, 0.28), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(59, 130, 246, 0.18), transparent 26%),
+    linear-gradient(135deg, #050816 0%, #080b1a 45%, #050816 100%);
+  color: #fff;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Smooth transitions */
+@layer components {
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Premium glass card */
+  .card {
+    @apply rounded-[2rem] border border-white/10 bg-white/[0.055] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition-smooth;
+  }
+
+  .card:hover {
+    @apply -translate-y-0.5 border-purple-400/30 bg-white/[0.075] shadow-[0_28px_90px_rgba(124,58,237,0.16)];
+  }
+
+  /* Premium button styles */
+  .btn-primary {
+    @apply rounded-2xl bg-gradient-to-r from-purple-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-[0_16px_45px_rgba(124,58,237,0.34)] transition-smooth hover:scale-[1.02] hover:shadow-[0_20px_55px_rgba(124,58,237,0.45)];
+  }
+
+  .btn-secondary {
+    @apply rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white backdrop-blur-xl transition-smooth hover:border-purple-400/30 hover:bg-white/10;
+  }
+
+  .btn-tertiary {
+    @apply rounded-full w-12 h-12 flex items-center justify-center bg-gradient-to-r from-purple-600/20 to-blue-500/20 border border-white/10 hover:border-purple-400/30 transition-smooth;
+  }
+
+  /* Form fields */
+  .field {
+    @apply mt-2 w-full rounded-2xl border border-white/10 bg-[#070b18]/80 px-4 py-3 text-white outline-none transition-smooth placeholder:text-gray-600 focus:border-purple-400/70 focus:ring-2 focus:ring-purple-500/20;
+  }
+
+  /* Typography */
+  .section-title {
+    @apply text-3xl font-black tracking-tight text-white;
+  }
+
+  .page-shell {
+    @apply p-4 space-y-6 md:p-8;
+  }
+
+  .eyebrow {
+    @apply text-sm font-semibold text-purple-300 uppercase tracking-wide;
+  }
+
+  .premium-panel {
+    @apply rounded-[2rem] border border-white/10 bg-white/[0.055] shadow-[0_28px_100px_rgba(0,0,0,0.32)] backdrop-blur-2xl;
+  }
+
+  /* Dashboard specific */
+  .dashboard-container {
+    @apply flex gap-6;
+  }
+
+  .dashboard-main {
+    @apply flex-1 space-y-6;
+  }
+
+  .dashboard-sidebar {
+    @apply w-80 space-y-6;
+  }
+
+  /* Summary cards grid */
+  .summary-grid {
+    @apply grid grid-cols-2 gap-4 md:grid-cols-4;
+  }
+
+  /* Mini card */
+  .mini-card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.055] p-4 backdrop-blur-xl transition-smooth hover:border-purple-400/20;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent;
+  }
+
+  /* Neon glow effect */
+  .neon-glow {
+    @apply shadow-[0_0_30px_rgba(124,58,237,0.4)];
+  }
+
+  /* Data label */
+  .data-label {
+    @apply text-sm font-medium text-gray-400;
+  }
+
+  .data-value {
+    @apply text-2xl font-bold text-white mt-1;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply rounded-2xl border border-white/10 bg-white/[0.055] p-5 backdrop-blur-xl space-y-3;
+  }
+}
+
