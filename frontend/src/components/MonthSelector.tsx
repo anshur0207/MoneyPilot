@@ -9,7 +9,7 @@ interface MonthSelectorProps {
 
 export default function MonthSelector({ month, year, onMonthChange }: MonthSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -22,7 +22,7 @@ export default function MonthSelector({ month, year, onMonthChange }: MonthSelec
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }
@@ -62,12 +62,12 @@ export default function MonthSelector({ month, year, onMonthChange }: MonthSelec
   }
 
   return (
-    <div className="relative inline-block">
+    <div ref={containerRef} className="relative inline-block">
       <motion.button
-        ref={buttonRef}
+        type="button"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((value) => !value)}
         className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-cyan-500/50 bg-gradient-to-r from-cyan-600/15 to-cyan-500/10 text-white hover:border-cyan-400/70 hover:from-cyan-600/25 hover:to-cyan-500/20 transition-all shadow-[0_0_20px_rgba(34,211,238,0.15)]"
       >
         <span className="text-sm font-semibold text-cyan-100">
@@ -91,6 +91,7 @@ export default function MonthSelector({ month, year, onMonthChange }: MonthSelec
           {/* Month Navigation */}
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <button
+              type="button"
               onClick={handlePrevMonth}
               className="p-1 hover:bg-white/10 rounded-lg transition-colors"
             >
@@ -100,6 +101,7 @@ export default function MonthSelector({ month, year, onMonthChange }: MonthSelec
             </button>
             <span className="text-sm font-semibold text-white">{year}</span>
             <button
+              type="button"
               onClick={handleNextMonth}
               className="p-1 hover:bg-white/10 rounded-lg transition-colors"
             >
@@ -110,27 +112,35 @@ export default function MonthSelector({ month, year, onMonthChange }: MonthSelec
           </div>
 
           {/* Month Grid */}
-          <div className="grid grid-cols-3 gap-2 p-3">
-            {monthNames.map((m, idx) => (
-              <motion.button
-                key={idx}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleSelectMonth(idx, year)}
-                className={`py-2 px-2 rounded-lg text-xs font-medium transition-all ${
-                  month === idx && year === currentYear
-                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                    : 'text-gray-300 hover:bg-white/10'
-                }`}
-              >
-                {m.slice(0, 3)}
-              </motion.button>
-            ))}
+          <div className="grid grid-cols-3 gap-2 p-3 sm:grid-cols-4">
+            {monthNames.map((m, idx) => {
+              const isSelected = month === idx
+              const isCurrent = idx === currentMonth && year === currentYear
+              return (
+                <motion.button
+                  key={idx}
+                  type="button"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => handleSelectMonth(idx, year)}
+                  className={`w-full rounded-2xl py-3 text-xs font-semibold transition-all ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
+                      : isCurrent
+                        ? 'border border-cyan-500/20 text-cyan-100 hover:bg-cyan-500/10'
+                        : 'border border-white/10 text-gray-300 hover:bg-white/10'
+                  }`}
+                >
+                  {m}
+                </motion.button>
+              )
+            })}
           </div>
 
           {/* Actions */}
           <div className="border-t border-white/10 p-3 flex gap-2">
             <motion.button
+              type="button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleToday}
@@ -139,6 +149,7 @@ export default function MonthSelector({ month, year, onMonthChange }: MonthSelec
               This Month
             </motion.button>
             <motion.button
+              type="button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsOpen(false)}

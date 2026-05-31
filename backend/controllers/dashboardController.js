@@ -11,6 +11,23 @@ import {
 } from '../utils/calculations.js'
 import { calculateFinancialHealthScore } from '../utils/financeHealthService.js'
 
+const getNextMonthlyDueDate = (currentDate, targetDay) => {
+  const today = new Date(currentDate)
+  today.setHours(0, 0, 0, 0)
+
+  const currentMonthDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+  const candidateDay = Math.min(targetDay, currentMonthDays)
+  let candidate = new Date(today.getFullYear(), today.getMonth(), candidateDay)
+
+  if (candidate < today) {
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+    const nextMonthDays = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0).getDate()
+    candidate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), Math.min(targetDay, nextMonthDays))
+  }
+
+  return candidate
+}
+
 export const getDashboardSummary = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.userId)
@@ -73,6 +90,68 @@ export const getDashboardSummary = async (req, res, next) => {
       })
       .reduce((sum, e) => sum + e.amount, 0)
 
+    // Use previous month's leftover as carryover into this month
+    const prevMonthDate = new Date(year, month - 1, 1)
+    const prevMonth = prevMonthDate.getMonth()
+    const prevYear = prevMonthDate.getFullYear()
+
+    const previousMonthlyIncomes = await Income.find({
+      userId: req.user.userId,
+      month: prevMonth,
+      year: prevYear,
+    })
+    const previousMonthlyIncome = previousMonthlyIncomes.reduce((sum, income) => sum + income.amount, 0)
+
+    const previousMonthlyExpenses = expenses
+      .filter((e) => {
+        const eDate = new Date(e.date)
+        return eDate.getMonth() === prevMonth && eDate.getFullYear() === prevYear
+      })
+      .reduce((sum, e) => sum + e.amount, 0)
+
+    const previousMonthlyRemaining = previousMonthlyIncome - previousMonthlyExpenses
+    const availableBalance = previousMonthlyRemaining + (monthlyIncome - monthlyExpenses)
+
+    const upcomingWindowEnd = new Date()
+    upcomingWindowEnd.setDate(upcomingWindowEnd.getDate() + 30)
+
+    const upcomingExpenses = []
+
+    loans.forEach((loan) => {
+      if (loan.remainingAmount <= 0) return
+      const nextDueDate = getNextMonthlyDueDate(new Date(), loan.emiDate)
+      if (loan.startDate <= nextDueDate && loan.endDate >= nextDueDate && nextDueDate <= upcomingWindowEnd) {
+        upcomingExpenses.push({
+          id: loan._id.toString(),
+          type: 'EMI',
+          category: 'Loan EMI',
+          description: `${loan.type} - ${loan.lenderName}`,
+          amount: loan.emiAmount,
+          date: nextDueDate.toISOString(),
+        })
+      }
+    })
+
+    investments.forEach((investment) => {
+      if (!investment.monthlyContribution || investment.monthlyContribution <= 0) return
+      if (!investment.isMutualFund && investment.type !== 'SIP') return
+
+      const startDate = new Date(investment.startDate)
+      const nextDueDate = getNextMonthlyDueDate(new Date(), startDate.getDate())
+      if (startDate <= nextDueDate && nextDueDate <= upcomingWindowEnd) {
+        upcomingExpenses.push({
+          id: investment._id.toString(),
+          type: 'SIP',
+          category: 'SIP',
+          description: investment.name,
+          amount: investment.monthlyContribution,
+          date: nextDueDate.toISOString(),
+        })
+      }
+    })
+
+    upcomingExpenses.sort((a, b) => new Date(a.date) - new Date(b.date))
+
     res.json({
       user: {
         name: user.name,
@@ -89,6 +168,8 @@ export const getDashboardSummary = async (req, res, next) => {
         monthlyIncome,
         monthlyBurn: monthlyExpenses,
         monthlyRemaining: monthlyIncome - monthlyExpenses,
+        previousMonthlyRemaining,
+        availableBalance,
       },
       metrics: {
         healthScore,
@@ -100,7 +181,15 @@ export const getDashboardSummary = async (req, res, next) => {
       goals: {
         active: goals.filter((g) => g.status === 'Active').length,
         completed: goals.filter((g) => g.status === 'Completed').length,
+        totalSaved: goals.reduce((sum, g) => sum + (g.savedAmount || 0), 0),
+        totalTarget: goals.reduce((sum, g) => sum + (g.targetAmount || 0), 0),
+        progress: (() => {
+          const totalSaved = goals.reduce((sum, g) => sum + (g.savedAmount || 0), 0)
+          const totalTarget = goals.reduce((sum, g) => sum + (g.targetAmount || 0), 0)
+          return totalTarget > 0 ? Math.min(100, (totalSaved / totalTarget) * 100) : 0
+        })(),
       },
+      upcomingExpenses,
     })
   } catch (error) {
     next(error)

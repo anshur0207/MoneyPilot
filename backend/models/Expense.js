@@ -13,7 +13,7 @@ const expenseSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['Food', 'Travel', 'Fuel', 'Shopping', 'EMI', 'Rent', 'Family', 'Subscriptions', 'Entertainment', 'Other'],
+      enum: ['Food', 'Travel', 'Fuel', 'Shopping', 'EMI', 'Rent', 'Family', 'Subscriptions', 'Entertainment', 'Mutual Fund SIP', 'Other'],
       required: true,
     },
     description: {
@@ -36,6 +36,16 @@ const expenseSchema = new mongoose.Schema(
     notes: {
       type: String,
       default: '',
+    },
+    loanId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Loan',
+      default: null,
+    },
+    investmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Investment',
+      default: null,
     },
     createdAt: {
       type: Date,

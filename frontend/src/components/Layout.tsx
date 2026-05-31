@@ -104,7 +104,7 @@ export default function Layout() {
       </aside>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
+      <div className="relative flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
         <header className="sticky top-0 z-40 border-b border-white/10 bg-[#050816]/75 backdrop-blur-2xl">
           <div className="flex h-16 items-center justify-between px-4 md:px-8 relative">

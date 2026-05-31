@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useMutation } from '../../hooks/useMutation'
+import DateInput from '../DateInput'
 
 const getNextSipDateFromStart = (startDate: string, monthlyContribution: number) => {
   if (!startDate || monthlyContribution <= 0) return null
@@ -120,13 +121,12 @@ export default function EditFundModal({ fund, onClose, onSaved }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">SIP Start Date</label>
-            <input
-              type="date"
+            <DateInput
+              label="SIP Start Date"
               max={new Date().toISOString().slice(0, 10)}
               value={formData.startDate}
               onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2 text-white focus:border-cyan-500 focus:outline-none mb-3"
+              className="mb-3"
             />
             {nextSipDate && (
               <p className="text-xs text-gray-400">Next SIP date: {nextSipDate}</p>

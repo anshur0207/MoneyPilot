@@ -6,6 +6,7 @@ import { useFetch } from '../hooks/useFetch'
 import { useMutation } from '../hooks/useMutation'
 import MonthSelector from '../components/MonthSelector'
 import AppErrorScreen from '../components/AppErrorScreen'
+import DateInput from '../components/DateInput'
 import { formatCurrency, formatDate } from '../utils/helpers'
 import api from '../utils/api'
 
@@ -141,7 +142,7 @@ export default function ExpensesPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between flex-wrap gap-4"
+          className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"
         >
           <div>
             <p className="eyebrow">Financial tracking</p>
@@ -150,22 +151,23 @@ export default function ExpensesPage() {
             </h1>
             <p className="text-gray-400 mt-2">{data?.total ?? 0} transactions tracked</p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="btn-primary flex items-center gap-2"
-            onClick={() => {
-              setEditingId(null)
-              setShowForm((value) => !value)
-            }}
-          >
-            <Plus className="w-4 h-4" />
-            {showForm ? 'Close' : 'Add Expense'}
-          </motion.button>
-        </motion.div>
 
-        {/* Month Selector */}
-        <MonthSelector month={month} year={year} onMonthChange={handleMonthChange} />
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <MonthSelector month={month} year={year} onMonthChange={handleMonthChange} />
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn-primary flex items-center gap-2"
+              onClick={() => {
+                setEditingId(null)
+                setShowForm((value) => !value)
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              {showForm ? 'Close' : 'Add Expense'}
+            </motion.button>
+          </div>
+        </motion.div>
 
         {/* Stats Cards */}
         <motion.div
@@ -217,16 +219,12 @@ export default function ExpensesPage() {
                 />
               </label>
 
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-300">Date</span>
-                <input
-                  className="field"
-                  type="date"
-                  value={form.date}
-                  onChange={(event) => setForm({ ...form, date: event.target.value })}
-                  required
-                />
-              </label>
+              <DateInput
+                label="Date"
+                value={form.date}
+                onChange={(event) => setForm({ ...form, date: event.target.value })}
+                required
+              />
 
               <label className="space-y-2">
                 <span className="text-sm font-medium text-gray-300">Category</span>

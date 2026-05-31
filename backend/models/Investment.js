@@ -88,6 +88,14 @@ const investmentSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    pendingSipAmount: {
+      type: Number,
+      default: 0,
+    },
+    pendingSipReflectDate: {
+      type: Date,
+      default: null,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
