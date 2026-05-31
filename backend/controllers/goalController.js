@@ -27,9 +27,11 @@ export const addGoal = async (req, res, next) => {
       description,
       category,
       targetAmount,
+      savedAmount,
       deadline,
       priority,
       emoji,
+      status,
     } = req.body
 
     const goal = new Goal({
@@ -38,9 +40,11 @@ export const addGoal = async (req, res, next) => {
       description,
       category,
       targetAmount,
+      savedAmount: Number(savedAmount || 0),
       deadline: new Date(deadline),
       priority,
       emoji,
+      status: status || (Number(savedAmount || 0) >= Number(targetAmount || 0) ? 'Completed' : 'Active'),
     })
 
     await goal.save()
@@ -59,9 +63,13 @@ export const updateGoal = async (req, res, next) => {
     const { id } = req.params
     const { savedAmount, status, ...rest } = req.body
 
+    const updateFields = { ...rest }
+    if (savedAmount !== undefined) updateFields.savedAmount = Number(savedAmount)
+    if (status) updateFields.status = status
+
     const goal = await Goal.findOneAndUpdate(
       { _id: id, userId: req.user.userId },
-      { ...rest, ...(savedAmount && { savedAmount }), ...(status && { status }) },
+      updateFields,
       { new: true }
     )
 

@@ -53,7 +53,7 @@ export default function OnboardingPage() {
     const monthlySalary = Number(form.monthlySalary || 0)
     const monthlyContribution = Number(form.monthlyContribution || 0)
     const assets = totalSavings + currentInvestmentValue
-    const netWorth = assets - loanRemaining
+    const netWorth = assets
     const savingsRate = monthlySalary ? (monthlyContribution / monthlySalary) * 100 : 0
     const debtRatio = assets ? loanRemaining / assets : 0
     let healthScore: number | null = null

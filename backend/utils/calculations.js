@@ -1,7 +1,7 @@
 export const calculateNetWorth = (assets, liabilities, totalIncome, totalExpenses) => {
-  // Net worth = (Total Income - Total Expenses) + Current Investment Value - Remaining Loans
+  // Net worth = (Total Income - Total Expenses) + Current Investment Value
   const cashAccumulation = totalIncome - totalExpenses
-  return cashAccumulation + assets - liabilities
+  return cashAccumulation + assets
 }
 
 export const calculateSavingsRate = (income, savings) => {

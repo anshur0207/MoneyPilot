@@ -82,9 +82,18 @@ app.use((req, res) => {
 app.use(errorHandler)
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`)
   console.log(`📊 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`)
+})
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use. Please stop the existing process or set a different PORT in .env.`)
+  } else {
+    console.error('❌ Server failed to start:', err)
+  }
+  process.exit(1)
 })
 
 // Graceful shutdown
