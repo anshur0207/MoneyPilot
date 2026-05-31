@@ -14,6 +14,7 @@ import goalRoutes from '../routes/goalRoutes.js'
 import incomeRoutes from '../routes/incomeRoutes.js'
 import dashboardRoutes from '../routes/dashboardRoutes.js'
 import reportRoutes from '../routes/reportRoutes.js'
+import { scheduleDailyExpenseCreation } from './services/loanExpenseScheduler.js'
 
 // Load environment variables
 dotenv.config()
@@ -42,6 +43,9 @@ app.use(cors({
 
 // Connect to database
 await connectDatabase()
+
+// Schedule auto EMI and SIP expense creation
+scheduleDailyExpenseCreation()
 
 // Routes
 app.use('/api/auth', authRoutes)

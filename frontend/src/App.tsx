@@ -15,6 +15,7 @@ import LoansPage from './pages/LoansPage'
 import GoalsPage from './pages/GoalsPage'
 import ReportsPage from './pages/ReportsPage'
 import HealthScorePage from './pages/HealthScorePage'
+import IncomePage from './pages/IncomePage'
 import SettingsPage from './pages/SettingsPage'
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/expenses" element={<ExpensesPage />} />
+            <Route path="/income" element={<IncomePage />} />
             <Route path="/mutual-funds" element={<MutualFundsPage />} />
             <Route path="/mutual-fund/:id" element={<MutualFundDetailsPage />} />
             <Route path="/loans" element={<LoansPage />} />

@@ -2,11 +2,10 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { TrendingUp, PlusCircle, ArrowUpRight, ArrowDownLeft, Target, Zap } from 'lucide-react'
-import SummaryCard from '../components/SummaryCard'
 import MonthSelector from '../components/MonthSelector'
 import AppErrorScreen from '../components/AppErrorScreen'
 import { useFetch } from '../hooks/useFetch'
-import { formatCurrency } from '../utils/helpers'
+import { formatCurrency, formatDate } from '../utils/helpers'
 
 interface DashboardResponse {
   user: {
@@ -24,6 +23,8 @@ interface DashboardResponse {
     monthlyIncome: number
     monthlyBurn: number
     monthlyRemaining: number
+    previousMonthlyRemaining: number
+    availableBalance: number
   }
   metrics: {
     healthScore: number | null
@@ -35,7 +36,17 @@ interface DashboardResponse {
   goals: {
     active: number
     completed: number
+    totalSaved: number
+    totalTarget: number
+    progress: number
   }
+  upcomingExpenses: {
+    type: string
+    category: string
+    description: string
+    amount: number
+    date: string
+  }[]
 }
 
 export default function DashboardPage() {
@@ -65,17 +76,16 @@ export default function DashboardPage() {
     return <AppErrorScreen type="error" onRetry={refetch} />
   }
 
-  const { user, summary, metrics, goals, monthString } = data
-
-  const formatDate = () => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    const current = new Date()
-    return `${days[current.getDay()]}, ${current.getDate()} ${months[current.getMonth()]}`
-  }
+  const { user, summary, metrics, goals, monthString, upcomingExpenses = [] } = data
 
   const expensePercent = summary.monthlyIncome > 0 ? (summary.monthlyBurn / summary.monthlyIncome) * 100 : 0
   const incomePercent = 100 - expensePercent
+  const incomeSummaryPercent = summary.monthlyIncome > 0 ? 100 : 0
+  const investmentsPercent = summary.netWorth > 0 ? Math.min(100, (summary.investments / summary.netWorth) * 100) : 0
+  const loansPercent = summary.monthlyIncome > 0 ? Math.min(100, (summary.loans / summary.monthlyIncome) * 100) : 0
+  const totalGoals = goals.active + goals.completed
+  const fallbackGoalsPercent = totalGoals > 0 ? Math.min(100, (goals.completed / totalGoals) * 100) : 0
+  const goalsPercent = goals.progress !== undefined ? Math.round(goals.progress) : Math.round(fallbackGoalsPercent)
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
@@ -184,7 +194,7 @@ export default function DashboardPage() {
                   <div className="text-2xl">📈</div>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-green-600 to-green-400" style={{ width: '75%' }} />
+                  <div className="h-full bg-gradient-to-r from-green-600 to-green-400" style={{ width: `${Math.round(investmentsPercent)}%` }} />
                 </div>
               </div>
 
@@ -194,12 +204,14 @@ export default function DashboardPage() {
                   <div>
                     <p className="data-label">Total Loans</p>
                     <p className="data-value">{formatCurrency(summary.loans)}</p>
-                    <p className="text-xs text-orange-400 mt-2">▲ 2.1%</p>
+                    <p className="text-xs text-orange-400 mt-2">
+                      {summary.loans === 0 ? '0%' : summary.monthlyIncome > 0 ? `▲ ${Math.round(loansPercent)}%` : 'N/A'}
+                    </p>
                   </div>
                   <div className="text-2xl">💳</div>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-orange-600 to-orange-400" style={{ width: '45%' }} />
+                  <div className="h-full bg-gradient-to-r from-orange-600 to-orange-400" style={{ width: `${Math.round(loansPercent)}%` }} />
                 </div>
               </div>
 
@@ -209,12 +221,12 @@ export default function DashboardPage() {
                   <div>
                     <p className="data-label">Goals Progress</p>
                     <p className="data-value">{goals.completed}/{goals.active + goals.completed}</p>
-                    <p className="text-xs text-blue-400 mt-2">42%</p>
+                    <p className="text-xs text-blue-400 mt-2">{Math.round(goalsPercent)}%</p>
                   </div>
                   <div className="text-2xl">🎯</div>
                 </div>
                 <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400" style={{ width: '42%' }} />
+                  <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400" style={{ width: `${Math.round(goalsPercent)}%` }} />
                 </div>
               </div>
             </motion.div>
@@ -316,6 +328,45 @@ export default function DashboardPage() {
                 </p>
               </div>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="premium-panel p-8"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-white">Upcoming Expenses</h3>
+                  <p className="text-xs text-gray-400">SIPs and loan EMIs due in the next 30 days</p>
+                </div>
+                <span className="text-xs text-gray-400">{upcomingExpenses.length} items</span>
+              </div>
+
+              {upcomingExpenses.length === 0 ? (
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-gray-400">
+                  No scheduled upcoming expenses yet.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {upcomingExpenses.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/5 p-4"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-white">{item.type === 'EMI' ? 'Loan EMI' : 'SIP'}</p>
+                        <p className="text-xs text-gray-400">{item.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-white">{formatCurrency(item.amount)}</p>
+                        <p className="text-xs text-gray-400">{formatDate(item.date)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
           </div>
 
           {/* Right Sidebar (30%) */}
@@ -343,10 +394,10 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-green-600 to-green-400" style={{ width: '52%' }} />
+                <div className="h-full bg-gradient-to-r from-green-600 to-green-400" style={{ width: `${Math.round(incomeSummaryPercent)}%` }} />
               </div>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-xs text-gray-500">52% of total</span>
+                <span className="text-xs text-gray-500">{Math.round(incomeSummaryPercent)}% of income</span>
               </div>
             </div>
 
@@ -362,10 +413,10 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-red-600 to-red-400" style={{ width: '48%' }} />
+                <div className="h-full bg-gradient-to-r from-red-600 to-red-400" style={{ width: `${Math.round(expensePercent)}%` }} />
               </div>
               <div className="mt-2 flex items-center justify-between">
-                <span className="text-xs text-gray-500">48% of total</span>
+                <span className="text-xs text-gray-500">{Math.round(expensePercent)}% of income</span>
               </div>
             </div>
 
@@ -373,8 +424,10 @@ export default function DashboardPage() {
             <div className="stat-card">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <p className="data-label">Remaining Amount</p>
-                  <p className="text-2xl font-bold text-white mt-1">{formatCurrency(summary.monthlyRemaining)}</p>
+                  <p className="data-label">Available Balance</p>
+                  <p className="text-2xl font-bold text-white mt-1">
+                    {formatCurrency(summary.availableBalance)}
+                  </p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600/30 to-blue-400/20 flex items-center justify-center">
                   <Zap className="w-5 h-5 text-blue-400" />
@@ -404,7 +457,7 @@ export default function DashboardPage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/expenses')}
+                  onClick={() => navigate('/income')}
                   className="flex flex-col items-center justify-center gap-2 rounded-3xl py-6 px-4 border border-white/15 bg-gradient-to-br from-blue-600/15 to-blue-500/5 hover:border-blue-400/40 hover:from-blue-600/25 hover:to-blue-500/15 transition-all"
                 >
                   <ArrowDownLeft className="w-5 h-5 text-blue-300" />

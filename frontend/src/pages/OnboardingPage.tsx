@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import api from '../utils/api'
 import { useAuthStore } from '../context/authStore'
 import { formatCurrency } from '../utils/helpers'
+import DateInput from '../components/DateInput'
 
 const today = new Date().toISOString().slice(0, 10)
 
@@ -229,10 +230,11 @@ export default function OnboardingPage() {
             Tenure months
             <input className="field" type="number" min="1" value={form.tenure} onChange={(event) => setForm({ ...form, tenure: event.target.value })} />
           </label>
-          <label className="text-sm text-gray-300">
-            End date
-            <input className="field" type="date" value={form.loanEndDate} onChange={(event) => setForm({ ...form, loanEndDate: event.target.value })} />
-          </label>
+          <DateInput
+            label="End date"
+            value={form.loanEndDate}
+            onChange={(event) => setForm({ ...form, loanEndDate: event.target.value })}
+          />
         </Section>
 
         <Section title="Goal">
@@ -254,10 +256,11 @@ export default function OnboardingPage() {
             Saved amount
             <input className="field" type="number" min="0" value={form.goalSavedAmount} onChange={(event) => setForm({ ...form, goalSavedAmount: event.target.value })} />
           </label>
-          <label className="text-sm text-gray-300">
-            Deadline
-            <input className="field" type="date" value={form.goalDeadline} onChange={(event) => setForm({ ...form, goalDeadline: event.target.value })} />
-          </label>
+          <DateInput
+            label="Deadline"
+            value={form.goalDeadline}
+            onChange={(event) => setForm({ ...form, goalDeadline: event.target.value })}
+          />
         </Section>
 
         <button className="btn-primary w-full py-4" disabled={saving}>

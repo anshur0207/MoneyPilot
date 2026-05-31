@@ -4,6 +4,7 @@ import { Plus, Trash2, Edit2, Target } from 'lucide-react'
 import { useFetch } from '../hooks/useFetch'
 import { calculatePercentage, formatCurrency, formatDate } from '../utils/helpers'
 import AppErrorScreen from '../components/AppErrorScreen'
+import DateInput from '../components/DateInput'
 import api from '../utils/api'
 
 interface Goal {
@@ -190,16 +191,12 @@ export default function GoalsPage() {
                   onChange={(e) => setForm({ ...form, savedAmount: e.target.value })}
                 />
               </label>
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-300">Deadline</span>
-                <input
-                  className="field"
-                  type="date"
-                  value={form.deadline}
-                  onChange={(e) => setForm({ ...form, deadline: e.target.value })}
-                  required
-                />
-              </label>
+              <DateInput
+                label="Deadline"
+                value={form.deadline}
+                onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                required
+              />
               <label className="space-y-2">
                 <span className="text-sm font-medium text-gray-300">Priority</span>
                 <select
