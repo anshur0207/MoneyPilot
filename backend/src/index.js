@@ -26,18 +26,28 @@ const PORT = process.env.PORT || 5000
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
-  .split(',')
-  .map((origin) => origin.trim())
+// Allowed Origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:3003',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'https://money-pilot-frontend-three.vercel.app'
+]
 
+// CORS Configuration
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',  // ← add this
-    'http://localhost:3003',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',  // ← and this
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (Postman/mobile apps)
+    if (!origin) return callback(null, true)
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true
 }))
 
