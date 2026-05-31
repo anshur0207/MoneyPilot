@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navigation from './Navigation'
+import BrandLogo from './BrandLogo'
 import { useAuthStore } from '../context/authStore'
 import { Search, Bell, LogOut } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
@@ -58,14 +59,12 @@ export default function Layout() {
         {/* Logo Section */}
         <div className="border-b border-white/10 p-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-r from-purple-600 to-blue-500 text-xl font-black text-white shadow-[0_0_35px_rgba(124,58,237,0.45)]">
-              M
-            </div>
-            <div>
-              <p className="text-lg font-bold tracking-wide text-white">MoneyPilot</p>
-              <p className="text-xs text-gray-400">Personal finance cockpit</p>
-            </div>
+          <BrandLogo className="h-12 w-12 rounded-2xl shadow-[0_0_35px_rgba(124,58,237,0.45)]" />
+          <div>
+            <p className="text-lg font-bold tracking-wide text-white">MoneyPilot</p>
+            <p className="text-xs text-gray-400">Personal finance cockpit</p>
           </div>
+        </div>
         </div>
 
         {/* Navigation Menu */}

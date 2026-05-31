@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import BrandLogo from '../components/BrandLogo'
 import {
   BellIcon,
   WalletIcon,
@@ -50,7 +51,7 @@ export default function LandingPage() {
 
       <nav className="relative z-10 flex items-center justify-between border-b border-white/10 px-6 py-6 backdrop-blur-xl md:px-16">
         <Link to="/" className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-purple-600 to-blue-500 shadow-[0_0_35px_rgba(124,58,237,0.45)]" />
+          <BrandLogo className="h-10 w-10" />
           <h1 className="text-2xl font-bold tracking-tight">MoneyPilot</h1>
         </Link>
 
